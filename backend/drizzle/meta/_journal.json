@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1785528061812,
+      "tag": "0000_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785531000000,
+      "tag": "0001_tmdb_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "9",
+      "when": 1785533000000,
+      "tag": "0003_remove_local_movies",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "10",
+      "when": 1785534000000,
+      "tag": "0004_remove_tmdb_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "11",
+      "when": 1785535000000,
+      "tag": "0005_user_movie_vote",
+      "breakpoints": true
+    }
+  ]
+}
