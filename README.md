@@ -106,40 +106,40 @@ Set env from `backend/.env.example`. For production:
 
 Migrations run automatically on API startup when `backend/drizzle` is present.
 
-Point Vercel `API_PROXY_TARGET` at this deployment’s public URL.
+Point your web app’s `API_PROXY_TARGET` (Vercel or Railway) at this deployment’s public URL.
 
-## Hosting the API on Railway
+## Railway (API + web)
 
-1. **New service** from this repo — leave **Root Directory empty** (repo root), so `pnpm-workspace.yaml` and `@binge-buddies/shared` resolve.
-2. Railpack reads **`railpack.json`** at the repo root (build shared + backend, start `node backend/dist/index.js`). Root `package.json` also defines `"start"` as a fallback.
-3. **Variables** — copy from `backend/.env.example` (Turso, Google, JWT, `CORS_ORIGIN`, `GOOGLE_REDIRECT_URI`, etc.). Railway sets `PORT` automatically.
-4. After deploy, copy the public URL into Vercel **`API_PROXY_TARGET`**.
+Two **services**, same GitHub repo. **Root Directory must be empty** (repo root) on both — not `web/` or `backend/`. Otherwise install uses npm and `workspace:*` breaks.
 
-If build still fails, set in Railway **Settings → Deploy**:
-- **Build command:** `pnpm install && pnpm run build:api`
-- **Start command:** `node backend/dist/index.js`
+| | **API service** | **Web service** |
+| --- | --- | --- |
+| **Railway config file** (Settings → Config) | `/railway.api.json` | `/railway.web.json` |
+| **Railpack config** (service variable) | *(default)* `railpack.json` | **`RAILPACK_CONFIG_FILE`** = `railpack.web.json` |
+| **Build** (via Railpack) | `pnpm run build:api` | `pnpm run build:web` |
+| **Start** | `node backend/dist/index.js` | `pnpm --filter @binge-buddies/web start` |
 
-## Hosting the web on Railway
+**API env** — from `backend/.env.example` (Turso, Google, JWT, etc.). Set `CORS_ORIGIN` and `GOOGLE_REDIRECT_URI` to the **web** public URL.
 
-Use a **second Railway service** from the same repo (separate from the API).
+**Web env**
 
-**If you see `npm install` + `EUNSUPPORTEDPROTOCOL workspace:`** — Railway is building only the `web/` folder. Railpack then uses **npm** and cannot install `@binge-buddies/shared`. Fix:
-
-| Setting | Value |
+| Variable | Value |
 | -------- | ----- |
-| **Root Directory** | **Empty** (repo root). Not `web`. |
-| **Config file** (Settings → Config) | `/railway.web.json` |
-| **Variable** | `RAILPACK_CONFIG_FILE` = `railpack.web.json` |
-| **Variable** | `API_PROXY_TARGET` = your API public URL (no trailing slash) |
+| `API_PROXY_TARGET` | API public URL (no trailing slash) |
+| `RAILPACK_CONFIG_FILE` | `railpack.web.json` (required so Railpack does not use API `railpack.json`) |
 
-**Deploy commands** (also in `railway.web.json`):
+`HOSTNAME=0.0.0.0` for Next is set in `railpack.web.json` / `railway.web.json`. Railway sets `PORT`.
 
-- **Build:** `pnpm run build:web` (do not use `pnpm install && …` — Railpack runs install separately; it must be **pnpm**, which requires repo root + lockfile)
-- **Start:** `pnpm run start:web`
+**Files**
 
-On the **API** service, set `CORS_ORIGIN` and `GOOGLE_REDIRECT_URI` to this web service’s public URL.
+| File | Role |
+| ---- | ---- |
+| `railpack.json` | Default Railpack plan → **API** |
+| `railpack.web.json` | Railpack plan → **web** (via `RAILPACK_CONFIG_FILE`) |
+| `railway.api.json` | Railway UI config for API service |
+| `railway.web.json` | Railway UI config for web service |
 
-Railway sets `PORT`; `next start` picks it up automatically.
+Do not set a custom **Build command** in the Railway dashboard unless debugging; it overrides Railpack and is easy to get wrong.
 
 ---
 

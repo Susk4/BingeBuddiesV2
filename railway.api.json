@@ -3,18 +3,15 @@
   "build": {
     "builder": "RAILPACK",
     "watchPatterns": [
-      "web/**",
+      "backend/**",
       "packages/shared/**",
       "pnpm-lock.yaml",
       "pnpm-workspace.yaml",
       "package.json",
-      "railpack.web.json"
+      "railpack.json"
     ]
   },
   "deploy": {
-    "startCommand": "pnpm --filter @binge-buddies/web start",
-    "variables": {
-      "HOSTNAME": "0.0.0.0"
-    }
+    "startCommand": "node backend/dist/index.js"
   }
 }

@@ -2,15 +2,12 @@
   "$schema": "https://schema.railpack.com",
   "provider": "node",
   "packages": {
-    "node": "22"
+    "node": "22",
+    "pnpm": "9"
   },
   "steps": {
     "build": {
-      "commands": [
-        "...",
-        "pnpm --filter @binge-buddies/shared build",
-        "pnpm --filter @binge-buddies/backend build"
-      ]
+      "commands": ["...", "pnpm run build:api"]
     }
   },
   "deploy": {
