@@ -8,10 +8,6 @@ const required = (name: string): string => {
   return value;
 };
 
-
-
-
-
 export const config = {
   port: Number(process.env.PORT ?? 4000),
   googleClientId: required("GOOGLE_CLIENT_ID"),

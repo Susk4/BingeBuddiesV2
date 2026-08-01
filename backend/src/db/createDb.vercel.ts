@@ -50,6 +50,7 @@ export const createDb = async (
   }
 
   const client = createRemoteClient(url, libsqlAuthToken);
+  await client.execute("SELECT 1");
   const db = drizzle(client, { schema });
   await runMigrations(db);
   return db;
