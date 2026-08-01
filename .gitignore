@@ -39,6 +39,7 @@ backend/.env
 /backend/data/
 /backend/dist/
 /packages/shared/dist/
+*.tsbuildinfo
 *.sqlite
 *.sqlite-journal
 
