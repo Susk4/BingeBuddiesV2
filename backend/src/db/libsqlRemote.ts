@@ -1,7 +1,7 @@
 import type { Client } from "@libsql/client";
 import { createClient as createHttpClient } from "@libsql/client/http";
 
-/** Turso / remote libsql over HTTP (bundled by Next.js API routes). */
+/** Turso / remote libsql over HTTP. */
 export const createRemoteClient = (
   url: string,
   libsqlAuthToken: string,

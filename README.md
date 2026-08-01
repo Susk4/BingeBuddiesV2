@@ -18,15 +18,15 @@ Discover titles from [TMDB](https://www.themoviedb.org/), swipe through picks wi
 | Layer    | Tech |
 | -------- | ---- |
 | Web      | Next.js, React, Tailwind CSS, TanStack Query |
-| API      | Hono (Node + Vercel handler) |
-| Data     | SQLite / libSQL, Drizzle ORM |
+| API      | Hono on Node (`backend/src/index.ts`) |
+| Data     | SQLite / libSQL (Turso), Drizzle ORM |
 | Shared   | `@binge-buddies/shared` types & constants |
 
 ## Monorepo layout
 
 ```
-├── web/                 # Next.js app (port 3000)
-├── backend/             # Hono API (port 4000 in local dev)
+├── web/                 # Next.js app (port 3000) — deploy to Vercel
+├── backend/             # Hono API (port 4000) — run on your own host
 └── packages/shared/     # Shared TypeScript package
 ```
 
@@ -72,43 +72,52 @@ pnpm dev:all
 | `pnpm build` | Build shared, backend, and web |
 | `pnpm --filter @binge-buddies/backend db:studio` | Drizzle Studio |
 
-## Deploying to Vercel
+## Deploying the web (Vercel)
 
-Two **Vercel projects**, same Git repo. Most behavior is in each app’s **`vercel.json`**; you only set a few things in the dashboard once per project.
+**One Vercel project** — Root Directory **`web`**, enable **Include source files outside the Root Directory** (for `packages/shared`).
 
-### What `vercel.json` does (no duplication)
-
-| File | Handles |
-| ---- | ------- |
-| `backend/vercel.json` | Monorepo `pnpm install`, **shared + backend** build, Hono rewrites, ship `drizzle/**` with the serverless function |
-| `web/vercel.json` | Monorepo `pnpm install`, **shared + web** build (Next only) |
-
-`packages/shared` is built on **each** deploy and linked via `workspace:*` — not a third Vercel project.
-
-### Dashboard (once per project)
-
-Create two projects from the same repository:
-
-| | **API** | **Web** |
-|---|--------|--------|
-| **Root Directory** | `backend` | `web` |
-| **Include source files outside Root Directory** | On | On |
-
-Vercel reads `vercel.json` from that root folder automatically. You do **not** put a single root `vercel.json` at the repo top for both apps.
-
-### Environment variables
-
-**API project** — from `backend/.env.example` (Turso, Google OAuth, JWT, `CORS_ORIGIN` = your web URL, etc.). `GOOGLE_REDIRECT_URI` must be the **web** callback (e.g. `https://your-app.vercel.app/auth/google/callback`).
-
-**Web project** — set at build time (Next rewrites):
+Build settings come from `web/vercel.json` (install at repo root, build shared + web).
 
 | Variable | Purpose |
 | -------- | ------- |
-| `API_PROXY_TARGET` | API deployment origin, e.g. `https://your-api.vercel.app` (no trailing slash) |
+| `API_PROXY_TARGET` | **Required in production.** Origin of your Hono API, e.g. `https://api.example.com` (no trailing slash). Next rewrites `/auth`, `/api`, and `/health` to this host. |
 
-Optional: link projects in `web/vercel.json` with [`relatedProjects`](https://vercel.com/docs/monorepos#how-to-link-projects-together-in-a-monorepo) and resolve the API host via `@vercel/related-projects` instead of a manual URL.
+Leave `NEXT_PUBLIC_API_URL` empty so the browser uses same-origin paths and cookies stay on the web domain.
 
-The browser still calls same-origin `/api/...`; Next proxies to the Hono deployment.
+## Hosting the API (any Node provider)
+
+The API is a normal long-running Node process, not a Vercel serverless bundle.
+
+```bash
+pnpm install
+pnpm --filter @binge-buddies/shared build
+pnpm --filter @binge-buddies/backend build
+cd backend && node dist/index.js
+```
+
+Set env from `backend/.env.example`. For production:
+
+| Variable | Notes |
+| -------- | ----- |
+| `DATABASE_URL` / `LIBSQL_AUTH_TOKEN` | Turso (or remote libSQL); file SQLite is fine for a single VM |
+| `CORS_ORIGIN` | Your web origin, e.g. `https://your-app.vercel.app` (include `https://`) |
+| `GOOGLE_REDIRECT_URI` | Web callback URL, e.g. `https://your-app.vercel.app/auth/google/callback` (must match Google Console) |
+| `PORT` | Often set by the host (Railway, Fly, Render, etc.) |
+
+Migrations run automatically on API startup when `backend/drizzle` is present.
+
+Point Vercel `API_PROXY_TARGET` at this deployment’s public URL.
+
+## Hosting the API on Railway
+
+1. **New service** from this repo — leave **Root Directory empty** (repo root), so `pnpm-workspace.yaml` and `@binge-buddies/shared` resolve.
+2. Railpack reads **`railpack.json`** at the repo root (build shared + backend, start `node backend/dist/index.js`). Root `package.json` also defines `"start"` as a fallback.
+3. **Variables** — copy from `backend/.env.example` (Turso, Google, JWT, `CORS_ORIGIN`, `GOOGLE_REDIRECT_URI`, etc.). Railway sets `PORT` automatically.
+4. After deploy, copy the public URL into Vercel **`API_PROXY_TARGET`**.
+
+If build still fails, set in Railway **Settings → Deploy**:
+- **Build command:** `pnpm install && pnpm run build:api`
+- **Start command:** `node backend/dist/index.js`
 
 ---
 

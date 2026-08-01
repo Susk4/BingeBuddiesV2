@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "packages": {
+    "node": "22"
+  },
+  "steps": {
+    "build": {
+      "commands": [
+        "...",
+        "pnpm --filter @binge-buddies/shared build",
+        "pnpm --filter @binge-buddies/backend build"
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "node backend/dist/index.js"
+  }
+}
