@@ -19,8 +19,8 @@ export const toLibsqlUrl = (databaseUrl: string): string => {
 const resolveMigrationsFolder = (): string | null => {
   const candidates = [
     path.join(__dirname, "../../drizzle"),
+    path.join(process.cwd(), "drizzle"),
     path.join(process.cwd(), "backend/drizzle"),
-    path.join(process.cwd(), "../backend/drizzle"),
   ];
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
@@ -37,7 +37,7 @@ const runMigrations = async (db: LibSQLDatabase<typeof schema>) => {
   }
 };
 
-/** Remote DB only — safe for Vercel / Next API bundle. */
+/** Remote DB only — used by the Vercel serverless entry (`api/index.ts`). */
 export const createDb = async (
   databaseUrl: string,
   libsqlAuthToken: string,

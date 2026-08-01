@@ -74,12 +74,41 @@ pnpm dev:all
 
 ## Deploying to Vercel
 
-1. In the project **Settings → General**, set **Root Directory** to `web` (confirm when prompted).
-2. Enable **Include source files outside of the Root Directory in the Build Step** (needed for `backend/` and `packages/shared/`).
-3. Build/install commands are defined in `web/vercel.json` (monorepo `pnpm install` + `pnpm run build` from the repo root).
-4. Add environment variables from `backend/.env.example` and `web/.env.example` in the Vercel dashboard (production secrets, Turso, Google OAuth, TMDB, JWT, etc.).
+Two **Vercel projects**, same Git repo. Most behavior is in each app’s **`vercel.json`**; you only set a few things in the dashboard once per project.
 
-If the root directory stays at the repository root, Vercel treats the project as a static site and looks for a `public` output folder after build.
+### What `vercel.json` does (no duplication)
+
+| File | Handles |
+| ---- | ------- |
+| `backend/vercel.json` | Monorepo `pnpm install`, **shared + backend** build, Hono rewrites, ship `drizzle/**` with the serverless function |
+| `web/vercel.json` | Monorepo `pnpm install`, **shared + web** build (Next only) |
+
+`packages/shared` is built on **each** deploy and linked via `workspace:*` — not a third Vercel project.
+
+### Dashboard (once per project)
+
+Create two projects from the same repository:
+
+| | **API** | **Web** |
+|---|--------|--------|
+| **Root Directory** | `backend` | `web` |
+| **Include source files outside Root Directory** | On | On |
+
+Vercel reads `vercel.json` from that root folder automatically. You do **not** put a single root `vercel.json` at the repo top for both apps.
+
+### Environment variables
+
+**API project** — from `backend/.env.example` (Turso, Google OAuth, JWT, `CORS_ORIGIN` = your web URL, etc.). `GOOGLE_REDIRECT_URI` must be the **web** callback (e.g. `https://your-app.vercel.app/auth/google/callback`).
+
+**Web project** — set at build time (Next rewrites):
+
+| Variable | Purpose |
+| -------- | ------- |
+| `API_PROXY_TARGET` | API deployment origin, e.g. `https://your-api.vercel.app` (no trailing slash) |
+
+Optional: link projects in `web/vercel.json` with [`relatedProjects`](https://vercel.com/docs/monorepos#how-to-link-projects-together-in-a-monorepo) and resolve the API host via `@vercel/related-projects` instead of a manual URL.
+
+The browser still calls same-origin `/api/...`; Next proxies to the Hono deployment.
 
 ---
 
