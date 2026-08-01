@@ -72,6 +72,15 @@ pnpm dev:all
 | `pnpm build` | Build shared, backend, and web |
 | `pnpm --filter @binge-buddies/backend db:studio` | Drizzle Studio |
 
+## Deploying to Vercel
+
+1. In the project **Settings → General**, set **Root Directory** to `web` (confirm when prompted).
+2. Enable **Include source files outside of the Root Directory in the Build Step** (needed for `backend/` and `packages/shared/`).
+3. Build/install commands are defined in `web/vercel.json` (monorepo `pnpm install` + `pnpm run build` from the repo root).
+4. Add environment variables from `backend/.env.example` and `web/.env.example` in the Vercel dashboard (production secrets, Turso, Google OAuth, TMDB, JWT, etc.).
+
+If the root directory stays at the repository root, Vercel treats the project as a static site and looks for a `public` output folder after build.
+
 ---
 
 Built for people who take “one more episode” a little too seriously.
