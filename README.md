@@ -119,6 +119,28 @@ If build still fails, set in Railway **Settings → Deploy**:
 - **Build command:** `pnpm install && pnpm run build:api`
 - **Start command:** `node backend/dist/index.js`
 
+## Hosting the web on Railway
+
+Use a **second Railway service** from the same repo (separate from the API).
+
+**If you see `npm install` + `EUNSUPPORTEDPROTOCOL workspace:`** — Railway is building only the `web/` folder. Railpack then uses **npm** and cannot install `@binge-buddies/shared`. Fix:
+
+| Setting | Value |
+| -------- | ----- |
+| **Root Directory** | **Empty** (repo root). Not `web`. |
+| **Config file** (Settings → Config) | `/railway.web.json` |
+| **Variable** | `RAILPACK_CONFIG_FILE` = `railpack.web.json` |
+| **Variable** | `API_PROXY_TARGET` = your API public URL (no trailing slash) |
+
+**Deploy commands** (also in `railway.web.json`):
+
+- **Build:** `pnpm run build:web` (do not use `pnpm install && …` — Railpack runs install separately; it must be **pnpm**, which requires repo root + lockfile)
+- **Start:** `pnpm run start:web`
+
+On the **API** service, set `CORS_ORIGIN` and `GOOGLE_REDIRECT_URI` to this web service’s public URL.
+
+Railway sets `PORT`; `next start` picks it up automatically.
+
 ---
 
 Built for people who take “one more episode” a little too seriously.

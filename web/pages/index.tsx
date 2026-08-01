@@ -148,7 +148,7 @@ const Main = ({ auth }: MainProps) => {
         subtitle="Like a title to save it to your list. Pass to see the next one."
       />
       {current ? (
-        <div className="flex min-h-0 flex-1 items-stretch justify-center">
+        <div className="flex min-h-0 w-full min-w-0 flex-1 items-stretch justify-center">
           <Card
             key={current.id ?? stack.length}
             onVote={(result) => handleVote(current, result)}

@@ -1,7 +1,7 @@
 import React from "react";
 import Head from "next/head";
 
-const MetaData = ({ children }) => {
+const MetaData = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Head>
@@ -16,7 +16,7 @@ const MetaData = ({ children }) => {
         </title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
-      <main>{children}</main>
+      {children}
     </>
   );
 };

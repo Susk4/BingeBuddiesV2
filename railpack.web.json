@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "packages": {
+    "node": "22"
+  },
+  "steps": {
+    "build": {
+      "commands": [
+        "...",
+        "pnpm --filter @binge-buddies/shared build",
+        "pnpm --filter @binge-buddies/web build"
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter @binge-buddies/web start",
+    "variables": {
+      "HOSTNAME": "0.0.0.0"
+    }
+  }
+}

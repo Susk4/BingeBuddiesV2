@@ -31,7 +31,7 @@ const PageShell = forwardRef<HTMLDivElement, PageShellProps>(
       <div
         ref={ref}
         className={[
-          "mx-auto w-full",
+          "mx-auto w-full min-w-0",
           fill
             ? "flex min-h-0 flex-1 flex-col overflow-hidden py-2 md:py-3"
             : "bb-scrollbar-hidden min-h-0 flex-1 overflow-y-auto py-6 md:py-10",

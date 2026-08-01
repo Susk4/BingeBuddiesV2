@@ -12,7 +12,7 @@ import type { AppProps } from "next/app";
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <div
-      className={`${fontSans.className} ${fontClassNames} h-dvh max-h-dvh overflow-hidden font-sans`}
+      className={`${fontSans.className} ${fontClassNames} flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden font-sans`}
     >
       <MetaData>
         <TmdbQueryProvider>

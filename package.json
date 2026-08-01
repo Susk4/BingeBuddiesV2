@@ -5,14 +5,18 @@
   "scripts": {
     "build": "pnpm --filter @binge-buddies/shared build && pnpm --filter @binge-buddies/backend build && pnpm --filter @binge-buddies/web build",
     "build:api": "pnpm --filter @binge-buddies/shared build && pnpm --filter @binge-buddies/backend build",
+    "build:web": "pnpm --filter @binge-buddies/shared build && pnpm --filter @binge-buddies/web build",
     "start": "node backend/dist/index.js",
+    "start:web": "pnpm --filter @binge-buddies/web start",
     "dev:web": "pnpm --filter @binge-buddies/web dev",
     "dev:api": "pnpm --filter @binge-buddies/backend dev",
     "dev:all": "pnpm --filter @binge-buddies/backend --filter @binge-buddies/web --parallel run dev",
     "dev:stop": "sh -c 'for port in 3000 3001 4000; do lsof -ti tcp:$port 2>/dev/null | xargs kill 2>/dev/null; done; true'",
     "lint": "pnpm --filter @binge-buddies/web lint"
   },
+  "packageManager": "pnpm@9.15.9",
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "pnpm": "9"
   }
 }
