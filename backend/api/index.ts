@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handle } from "@hono/node-server/vercel";
-import { getApp } from "../dist/getApp.js";
+import { getApp } from "../src/getApp.js";
 
 const appPromise = getApp();
 
