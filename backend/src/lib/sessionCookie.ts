@@ -7,10 +7,7 @@ const SEVEN_DAYS_SEC = 60 * 60 * 24 * 7;
 const cookieBaseOptions = () => {
   return {
     httpOnly: true,
-    secure: config.cookieSecure,
-    sameSite: config.cookieSameSite,
     path: "/",
-    ...(config.cookieDomain ? { domain: config.cookieDomain } : {}),
   } as const;
 };
 
